@@ -18,6 +18,7 @@ public class ModificationProperty {
     private List<AttributeItem> applicationAttributeList = new ArrayList<>();
     private List<AttributeItem> manifestAttributeList = new ArrayList<>();
     private List<AttributeItem> usesSdkAttributeList = new ArrayList<>();
+    private List<Activity> activityList = new ArrayList<>();
 
     private PermissionMapper permissionMapper;
     private AttributeMapper<String> providerAuthorityMapper;
@@ -43,6 +44,11 @@ public class ModificationProperty {
 
     public ModificationProperty addProvider(HashMap<String,String> nameValue,String filterNameValue){
         providerList.add(new Provider(nameValue,filterNameValue));
+        return this;
+    }
+
+    public ModificationProperty addActivity(Activity activity) {
+        activityList.add(activity);
         return this;
     }
 
@@ -79,6 +85,10 @@ public class ModificationProperty {
 
     public List<Provider> getProviderList(){
         return providerList;
+    }
+
+    public List<Activity> getActivityList() {
+        return activityList;
     }
 
     public ModificationProperty addDeleteMetaData(String name) {
@@ -138,6 +148,32 @@ public class ModificationProperty {
         }
         public String getFilterNameValue(){
             return filterNameValue;
+        }
+    }
+
+    public static class Activity {
+        private String name;
+        private Boolean exported;
+
+
+        public Activity(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Boolean getExported() {
+            return exported;
+        }
+
+        public void setExported(Boolean exported) {
+            this.exported = exported;
         }
     }
 }

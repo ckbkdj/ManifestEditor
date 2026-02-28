@@ -87,6 +87,12 @@ public class ManifestEditorMain extends BaseCommand {
             ", multi option is supported", argName = "delete-meta-data-name")
     private List<String> deleteMetaDataList = new ArrayList<>();
 
+    @Opt(opt = "act", longOpt = "activity", description = "add new activity or replace existing activity, " +
+            "format: activity-name[:exported]" +
+            ", supports true/false or 1/0 for exported" +
+            ", multi option is supported", argName = "activity-config")
+    private List<String> activityList = new ArrayList<>();
+
     public static void main(String... args) {
         new ManifestEditorMain().doMain(args);
     }
@@ -272,6 +278,17 @@ public class ManifestEditorMain extends BaseCommand {
 
         for (String metaData : deleteMetaDataList) {
             property.addDeleteMetaData(metaData);
+        }
+
+        for (String activityConfig : activityList) {
+            String[] parts = activityConfig.split(":");
+            if (parts.length >= 1) {
+                ModificationProperty.Activity activity = new ModificationProperty.Activity(parts[0]);
+                if (parts.length >= 2 && !parts[1].isEmpty()) {
+                    activity.setExported("true".equalsIgnoreCase(parts[1]) || "1".equals(parts[1]));
+                }
+                property.addActivity(activity);
+            }
         }
 
 //        property.addManifestAttribute(new AttributeItem(NodeValue.Manifest.PACKAGE, "wind.new.pkg.name111").setNamespace(null))

@@ -6,7 +6,10 @@ import com.wind.meditor.property.ModificationProperty;
 import com.wind.meditor.property.PermissionMapper;
 import com.wind.meditor.utils.NodeValue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import pxb.android.axml.NodeVisitor;
 
 /**
@@ -18,8 +21,10 @@ public class ApplicationTagVisitor extends ModifyAttributeVisitor {
     private List<ModificationProperty.MetaData> metaDataList;
     private List<ModificationProperty.MetaData> deleteMetaDataList;
     private List<ModificationProperty.Provider> providerList;
+    private List<ModificationProperty.Activity> activityList;
     private PermissionMapper permissionMapper;
     private AttributeMapper<String> authorityMapper;
+    private Map<String, ModificationProperty.Activity> activityReplacementMap;
 
     private static final String META_DATA_FLAG = "meta_data_flag";
 
@@ -28,13 +33,21 @@ public class ApplicationTagVisitor extends ModifyAttributeVisitor {
                           List<ModificationProperty.MetaData> deleteMetaDataList,
                           PermissionMapper permissionMapper,
                           AttributeMapper<String> authorityMapper,
-                          List<ModificationProperty.Provider> providerList) {
+                          List<ModificationProperty.Provider> providerList,
+                          List<ModificationProperty.Activity> activityList) {
         super(nv, modifyAttributeList);
         this.metaDataList = metaDataList;
         this.deleteMetaDataList = deleteMetaDataList;
         this.permissionMapper = permissionMapper;
         this.authorityMapper = authorityMapper;
-        this.providerList = providerList; // 儲存 providerList
+        this.providerList = providerList;
+        this.activityList = activityList;
+        this.activityReplacementMap = new HashMap<>();
+        if (activityList != null) {
+            for (ModificationProperty.Activity activity : activityList) {
+                activityReplacementMap.put(activity.getName(), activity);
+            }
+        }
     }
 
     @Override
@@ -51,7 +64,11 @@ public class ApplicationTagVisitor extends ModifyAttributeVisitor {
             NodeVisitor nv = super.child(ns, name);
             return new DeleteMetaDataVisitor(nv, deleteMetaDataList);
         } else if (NodeValue.Application.COMPONENT_TAGS.contains(name)) {
-            return new ApplicationComponentTagVisitor(super.child(ns, name), permissionMapper, authorityMapper);
+            NodeVisitor nv = super.child(ns, name);
+            if (NodeValue.Application.Activity.TAG_NAME.equals(name)) {
+                return new ActivityTagVisitor(nv, activityReplacementMap);
+            }
+            return new ApplicationComponentTagVisitor(nv, permissionMapper, authorityMapper);
         }
         return super.child(ns, name);
     }
@@ -82,6 +99,15 @@ public class ApplicationTagVisitor extends ModifyAttributeVisitor {
             for (ModificationProperty.Provider provider : providerList) {
                 NodeVisitor nv = super.child(null, "provider");
                 new ProviderVisitor(nv, provider);
+            }
+        }
+        if (!activityReplacementMap.isEmpty()) {
+            for (ModificationProperty.Activity activity : activityReplacementMap.values()) {
+                NodeVisitor nv = super.child(null, "activity");
+                if (nv != null) {
+                    ActivityTagVisitor activityVisitor = new ActivityTagVisitor(nv, activity);
+                    activityVisitor.end();
+                }
             }
         }
         super.end();

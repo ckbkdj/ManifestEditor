@@ -28,6 +28,10 @@ options:
                              ld be separated by : , if name is in android namesp
                              ace, prefix "android-" should be set, multi option 
                              is supported
+ -act,--activity <activity-config>
+                             add/replace activity, format: activity-name[:exported]
+                             , supports true/false or 1/0 for exported
+                             , multi option is supported
  -an,--applicationName <new-application-name>
                              set the app entry application name
  -d,--debuggable <0 or 1>    set 1 to make the app debuggable = true, set 0 to m
@@ -150,6 +154,18 @@ $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -dmd xposedminversion -
          <meta-data />
 ```
 通过删除和新增两个操作可以实现对某个指定的`<meta-data/>`的修改。
+
+### 11. 新增Activity节点: `-act`
+```
+$ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -act com.example.NewActivity
+```
+添加带exported属性的Activity：
+```
+$ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -act com.example.LoginActivity:true
+```
+参数格式：`activity-name[:exported]`
+
+**注意**：目前Activity功能已简化，仅支持name和exported属性。如果需要更复杂的Activity配置，请使用其他工具或直接编辑Manifest文件。
 # **修改Apk中的Manifest文件**
 ```
 $ java -jar ../ManifestEditor.jar ../original.apk -o ../new_build_unsigned.apk -d 1
