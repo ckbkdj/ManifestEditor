@@ -57,17 +57,16 @@ public class ApplicationTagVisitor extends ModifyAttributeVisitor {
 
     @Override
     public NodeVisitor child(String ns, String name) {
-        System.out.println(" ManifestTagVisitor child  --> ns = " + ns + " name = " + name);
         if (META_DATA_FLAG.equals(ns)) {
-            NodeVisitor nv = super.child(null, name);
             if (curMetaData != null) {
+                NodeVisitor nv = super.child(null, name);
                 return new MetaDataVisitor(nv, new ModificationProperty.MetaData(
                         curMetaData.getName(), curMetaData.getValue()));
             }
+            return super.child(ns, name);
         } else if (NodeValue.MetaData.TAG_NAME.equals(name)
-                && deleteMetaDataList != null && !deleteMetaDataList.isEmpty()) {
-            NodeVisitor nv = super.child(ns, name);
-            return new DeleteMetaDataVisitor(nv, deleteMetaDataList);
+            && deleteMetaDataList != null && !deleteMetaDataList.isEmpty()) {
+            return new DeleteMetaDataVisitor(this.nv, deleteMetaDataList, ns, name);
         } else if (NodeValue.Application.COMPONENT_TAGS.contains(name)) {
             if (NodeValue.Application.Provider.TAG_NAME.equals(name)
                     && deleteProviderAuthorities != null && !deleteProviderAuthorities.isEmpty()) {
