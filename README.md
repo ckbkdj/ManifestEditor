@@ -1,16 +1,16 @@
-#  **ManifestEditor**
+# **ManifestEditor**
 This is a tool used to modify Android Manifest binary file.  
-此工具用于修改AndroidManifest二进制文件。比如，更改Manifest文件中的app包名，版本号，更改或新增app入口Application的类名，更改或新增debuggable的属性，增加usesPermission标签，增加meta-data标签等。
-同时，为了更方便使用，提供了直接修改Apk包中的Manifest文件，并对修改后的Apk进行签名的功能。
+此工具用于修改 AndroidManifest 二进制文件（AXML）。比如，更改 manifest 文件中的 app 包名、版本号，更改或新增 app 入口 Application 的类名，更改或新增 debuggable 属性，增加 uses-permission 标签、meta-data 标签等。
+同时，为了更方便使用，提供了直接修改 apk 包中的 manifest 文件，并对修改后的 apk 进行签名的功能。
 
-比较常见的修改AndroidManifest二进制文件的工具，大致有:[apkeditor](https://github.com/8enet/apkeditor)和[AXMLEditor](https://github.com/fourbrother/AXMLEditor)
+比较常见的修改 AndroidManifest 二进制文件的工具，大致有 [apkeditor](https://github.com/8enet/apkeditor) 和 [AXMLEditor](https://github.com/fourbrother/AXMLEditor)。
 
-但是，这些工具都有一个相同的问题: 新增属性无法被Android系统解析出来。  
-比如，在application标签下增加debuggable=true属性，安装后的App并不是debuggable的。
+但是，这些工具都有一个相同的问题：新增的属性无法被 Android 系统解析出来。
+比如，在 application 标签下增加 `debuggable=true` 属性，安装后的 App 并不是 debuggable 的。
 
 本工具并不存在此问题。当然，本工具可能存在其他一些问题，并未作充分测试。
 
-此项目基于[axml](https://github.com/Sable/axml)，并在其基础做了二次封装和一些优化，使用起来更加方便。
+此项目基于 [axml](https://github.com/Sable/axml)，并在其基础上做了二次封装和一些优化，使用起来更加方便。
 
 This tool is used in project [Xpatch](https://github.com/WindySha/Xpatch)
 #  **Jar包下载**
@@ -60,64 +60,64 @@ options:
  -vn,--versionName <new-version-name>set the app version name
 version: 1.0.2
 ```
-# **修改Manifest文件**
-### 1. 修改Manifest中app包名: `-pkg`
+# **修改 Manifest 文件**
+### 1. 修改 Manifest 中 app 包名: `-pkg`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -pkg com.test.newpackage
 ```
 在AndroidManifest.xml文件相同的目录下，会生成一个新的xml文件：AndroidManifest-new.xml
 
 这个新的manifest文件中，package被改成了`com.test.newpackage`。
-### 2. 新增debuggable = true的属性: `-d`
+### 2. 新增 debuggable = true 的属性: `-d`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -d 1
 ```
-新的manifest文件中，Application标签下，增加了`android:debuggable = "true"`属性。
-如果需要将debuggable改为false，只需：
+新的 manifest 文件中，Application 标签下，增加了`android:debuggable = "true"`属性。
+如果需要将 debuggable 改为 false，只需：
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -d 0
 ```
-### 3. 修改Manifest文件中的versionCode和versionName: `-vc` `-vn`
+### 3. 修改 Manifest 文件中的 versionCode 和 versionName: `-vc` `-vn`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -vc 100 -vn 1.0.0
 ```
 新的manifest文件中，versionCode被改成了`100`，versionName被改成了`1.0.0`。
-### 4. 修改Manifest文件中的applicationName: `-an`
+### 4. 修改 Manifest 文件中的 applicationName: `-an`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -an com.test.new.MyApplication
 ```
 新的manifest文件中，application标签下的name被改为：`android:name="com.test.new.MyApplication"`。
-### 5. 新增Manifest文件中的usesPermission标签:`-up`
+### 5. 新增 Manifest 文件中的 usesPermission 标签:`-up`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -up android.permission.READ_EXTERNAL_STORAGE -up android.permission.WRITE_EXTERNAL_STORAGE
 ```
 新的manifest文件中，新增了读写sdcard两个权限标签。假如原Manifest文件中已经存在相关权限标签，则不会增加新的。
-### 6. 增加或修改顶层的manifest标签下的其他属性:`-ma`
+### 6. 增加或修改顶层的 manifest 标签下的其他属性:`-ma`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -ma android-compileSdkVersion:28 -ma android-compileSdkVersionCodename:9
 ```
-新的manifest文件中，顶层的manifest标签下新增或者修改的标签为：
+新的 manifest 文件中，顶层的 manifest 签下新增或者修改的标签为：
 ```
 <manifest
    ...
     android:compileSdkVersion="28"
     android:compileSdkVersionCodename="9">
 ```
-对于非android命名空间下的属性，去掉命令中的`android-`即可，暂不支持其他命名空间下的属性的更改。比如：
+对于非 android 命名空间下的属性，去掉命令中的 `android-` 即可，暂不支持其他命名空间下的属性的更改。比如：
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -ma platformBuildVersionCode:100
 ```
-改动的属性是platformBuildVersionCode：
+改动的属性是 platformBuildVersionCode：
 ```
 <manifest
    ...
    platformBuildVersionCode="100">
 ```
-### 7. 增加或修改application标签下的其他属性: `-aa`
+### 7. 增加或修改 application 标签下的其他属性: `-aa`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -aa android-allowBackup:false
 ```
-新的manifest文件中，application标签下新增或者修改的标签为：
+新的 manifest 文件中，application 标签下新增或者修改的标签为：
 ```
 <application
    ...
@@ -125,13 +125,13 @@ $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -aa android-allowBackup
     ...
 >
 ```
-对于非android命名空间下的属性，去掉命令中的`android-`即可，暂不支持其他命名空间下的属性的更改。
-### 8. 新Manifest文件输出到指定目录: `-o`
+对于非 android 命名空间下的属性，去掉命令中的 `android-` 即可，暂不支持其他命名空间下的属性的更改。
+### 8. 新 Manifest 文件输出到指定目录: `-o`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -o ../new_androidmanifest.xml -d 1
 ```
-将debuggable改为true后的Manifest文件输出为`new_androidmanifest.xml`
-### 9. Manifest文件中的新增MetaData标签: `-md`
+将 debuggable 改为 true 后的 Manifest 文件输出为`new_androidmanifest.xml`
+### 9. Manifest 文件中的新增 MetaData 标签: `-md`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -md xposedminversion:53 -md xposedmodule:true
 ```
@@ -144,18 +144,19 @@ $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -md xposedminversion:53
             android:name="xposedmodule"
             android:value="true" />
 ```
-### 10. Manifest文件中的删除MetaData标签: `-dmd`
+### 10. 删除 Manifest文件中的MetaData 标签: `-dmd`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -dmd xposedminversion -dmd xposedmodule
 ```
-如此，文件中，meta-data里的name为xposedminversion和xposedmodule的标签会被清空：
-```
-         <meta-data />
-         <meta-data />
-```
-通过删除和新增两个操作可以实现对某个指定的`<meta-data/>`的修改。
+`android:name` 等于 `xposedminversion` 或 `xposedmodule` 的 meta-data 标签会被**整个删除**，输出的 manifest 里不会再出现这两个节点。
 
-### 11. 新增或替换Activity节点: `-act`
+如果只是想把某个已有 meta-data 的值改掉，可以同时使用 `-dmd` 和 `-md`，先删除再新增：
+```
+$ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -dmd xposedmodule -md xposedmodule:99
+```
+这样输出中只会留下一个 `android:value="99"` 的 xposedmodule 节点。
+
+### 11. 新增或替换 Activity 节点: `-act`
 ```
 $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -act com.example.NewActivity
 ```
@@ -166,7 +167,43 @@ $ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -act com.example.LoginA
 参数格式：`activity-name[:exported]`
 
 **说明**：`-act` 目前只处理 `name` 和 `exported` 两个属性。新增时会写入这两个必要字段；若同名 Activity 已存在，则只更新当前支持的属性，不会扩展其他复杂配置。
-# **修改Apk中的Manifest文件**
+
+### 12. 设置 extractNativeLibs 属性: `-e`
+```
+$ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -e 1
+```
+新的 manifest 文件中，application 标签下会增加或修改`android:extractNativeLibs="true"`；传 `0` 则改为 `false`。
+
+### 13. 修改 uses-sdk 标签下的属性: `-ua`
+```
+$ java -jar ../ManifestEditor.jar ../AndroidManifest.xml -ua android-targetSdkVersion:28 -ua android-minSdkVersion:21
+```
+manifest 中已存在 uses-sdk 标签时，会新增或修改其中对应的属性。如果原 manifest 中没有 uses-sdk 标签，该选项不会新建这个标签。
+
+### 14. 新增或删除 provider 标签
+provider 的新增和删除暂时没有对应的命令行选项，需要在代码中通过 `ModificationProperty` 调用：
+```
+    List<AttributeItem> attributes = new ArrayList<>();
+    attributes.add(new AttributeItem("name", "com.test.new.MyProvider"));
+    attributes.add(new AttributeItem("authorities", "com.test.new.provider"));
+    attributes.add(new AttributeItem("exported", false));
+    attributes.add(new AttributeItem("grantUriPermissions", false));
+
+    property.addProvider(attributes, "com.test.new.action.PROVIDER");
+
+    property.addDeleteProviderAuthorities("com.test.old.provider");
+```
+`addProvider` 的第二个参数是 intent-filter 中 action 的 name，传 `null` 则不生成 intent-filter。
+
+**说明**：`exported`、`grantUriPermissions` 这类属性在平台上是用 `TypedArray.getBoolean` 读取的，如果写成字符串 `"true"`，平台会按默认值处理（等同于 false）。所以这里要把值写成 `Boolean`，visitor 才会按 `TYPE_INT_BOOLEAN` 写出。
+
+### 15. 统一改写权限名与 provider 的 authorities
+同样需要在代码中调用。`permissionMapper` 会作用于 uses-permission、permission 标签，以及组件上的 `android:permission`、`android:readPermission`、`android:writePermission`；`authorityMapper` 会作用于 provider 的 `android:authorities`（多个 authorities 用 `;` 分隔时会逐个改写）：
+```
+    property.setPermissionMapper((type, permission) -> permission.replace("com.old.", "com.new."));
+    property.setAuthorityMapper(authorities -> authorities.replace("com.old.", "com.new."));
+```
+# **修改 apk 中的 Manifest 文件**
 ```
 $ java -jar ../ManifestEditor.jar ../original.apk -o ../new_build_unsigned.apk -d 1
 ```
@@ -178,7 +215,7 @@ $ java -jar ../ManifestEditor.jar ../original.apk -o ../new_build.apk -d 1 -s
 `new_build.apk`文件目录会生成另外一个签名后的apk：`new_build_signed.apk`。
 
 默认使用的是jarsigner命令对apk签名，假如签名失败，可自行对`new_build.apk`进行签名。
-# **Android或者Java代码中使用**
+# **Android 或者 Java 代码中使用**
 也可以将`ManifestEditor.jar`文件导入到Android或Java工程中使用，接入方法为：
 ```
     ModificationProperty property = new ModificationProperty();
@@ -197,17 +234,16 @@ $ java -jar ../ManifestEditor.jar ../original.apk -o ../new_build.apk -d 1 -s
     String inputManifestFilePath = "../../AndroidManifest_old.xml";
     String outputManifestFilePath = "../../AndroidManifest.xml";
 
-    // 处理manifest文件方法
     FileProcesser.processManifestFile(inputManifestFilePath, outputManifestFilePath, property);
 
     String inputApkFilePath = "../../original_old.apk";
     String outputApkFilePath = "../../new_build_unsigned.apk";
 
-    // 处理得到的apk是未签名的，需要自行签名使用
     FileProcesser.processApkFile(inputApkFilePath, outputApkFilePath, property);
 ```
+`AttributeItem` 的第二个参数如果是 `String`，写出的类型是 `TYPE_STRING`；如果是 `Boolean`，写出的类型是 `TYPE_INT_BOOLEAN`。对于 `debuggable`、`exported` 这类平台按布尔读取的属性，必须传 `Boolean`。
 # **License**
-Originally forked from [axml](https://github.com/Sable/axml).
+Originally forked from [axml](https://github.com/Sable/axml).
 ```
 Copyright 2020, WindySha
 
